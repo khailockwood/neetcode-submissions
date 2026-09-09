@@ -1,0 +1,39 @@
+from collections import deque
+
+class Solution:
+    def orangesRotting(self, grid: List[List[int]]) -> int:
+        rows = len(grid)
+        cols = len(grid[0])
+
+        queue = deque()
+        visited = set()
+
+        neighbors = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+        minutes = 0
+        numFresh = 0
+        #numRotten = 0
+
+        #add only rotten indices to the queue, we only need to look at every rotten fruit
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 2:
+                    queue.append((i, j))
+                if grid[i][j] == 1:
+                    numFresh += 1
+        
+        #keep track of numFresh, we are searching until no more fresh fruits
+                   
+        while queue and numFresh > 0:
+            for i in range(len(queue)):
+                currR, currC = queue.popleft()
+                
+                for r, c in neighbors:
+                    if (currR + r < 0 or currC + c < 0) or (currR + r == rows or currC + c == cols) or grid[currR + r][currC + c] == 0 or (currR + r,currC + c) in visited:
+                        continue
+                    if (grid[currR + r][currC + c] == 1): #if we've found a fresh fruit that is neighbor of a rotten fruit (queue only has rotten fruit in it)
+                        grid[currR + r][currC + c] = 2
+                        numFresh -= 1
+                        queue.append((currR + r, currC + c)) #only add the new rotten fruit to queue, not every single element
+                        visited.add((currR + r, currC + c))
+            minutes += 1
+        return minutes if numFresh == 0 else -1
